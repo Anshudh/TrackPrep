@@ -1,0 +1,274 @@
+/* TrackPrep Visual Design System - Glassmorphism & Neon Accent theme */
+
+:root {
+  --bg-gradient-start: #08090c;
+  --bg-gradient-end: #12151e;
+  --card-bg: rgba(20, 24, 35, 0.65);
+  --card-border: rgba(255, 255, 255, 0.08);
+  
+  --primary-neon: #8b5cf6;     /* Vivid Purple */
+  --secondary-neon: #06b6d4;   /* Electric Cyan */
+  --accent-success: #10b981;   /* Emerald Green */
+  --accent-warning: #f59e0b;   /* Warm Amber */
+  --accent-danger: #ef4444;    /* Crimson Red */
+  
+  --text-primary: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-glow: 0 0 10px rgba(139, 92, 246, 0.55);
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(20, 20, 25, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+/* Glassmorphism Panel Cards */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 12px 40px 0 rgba(139, 92, 246, 0.15);
+}
+
+/* Glow effects */
+.text-neon-glow {
+  text-shadow: var(--text-glow);
+  color: #fff;
+}
+
+.border-neon-glow {
+  border-color: var(--primary-neon) !important;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
+}
+
+/* Sidebar Styling */
+.sidebar {
+  min-width: 250px;
+  max-width: 250px;
+  min-height: 100vh;
+  background: rgba(15, 18, 27, 0.85);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.sidebar-link.active {
+  color: #fff;
+  background: linear-gradient(90deg, var(--primary-neon) 0%, rgba(139, 92, 246, 0.2) 100%);
+  border-left: 4px solid var(--primary-neon);
+}
+
+/* Premium Buttons */
+.btn-neon-primary {
+  background: linear-gradient(135deg, var(--primary-neon) 0%, #7c3aed 100%);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.btn-neon-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+  color: #fff;
+}
+
+.btn-neon-secondary {
+  background: transparent;
+  color: #fff;
+  border: 1px solid var(--secondary-neon);
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.btn-neon-secondary:hover {
+  background: var(--secondary-neon);
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+  color: #0f172a;
+}
+
+/* Input Fields */
+.form-control-glass {
+  background: rgba(15, 18, 27, 0.6) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 10px !important;
+  transition: all 0.25s ease !important;
+}
+
+.form-control-glass:focus {
+  border-color: var(--primary-neon) !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.25) !important;
+  outline: none !important;
+}
+
+.form-select-glass {
+  background: rgba(15, 18, 27, 0.6) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 10px !important;
+  transition: all 0.25s ease !important;
+}
+
+.form-select-glass:focus {
+  border-color: var(--primary-neon) !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.25) !important;
+}
+
+/* Custom Platform and Difficulty Badges */
+.badge-easy {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: var(--accent-success) !important;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-medium {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: var(--accent-warning) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-hard {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: var(--accent-danger) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Platform Styles */
+.badge-leetcode {
+  background-color: rgba(255, 161, 22, 0.15) !important;
+  color: #ffa116 !important;
+  border: 1px solid rgba(255, 161, 22, 0.3);
+}
+
+.badge-codeforces {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  color: #3b82f6 !important;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.badge-codechef {
+  background-color: rgba(150, 75, 0, 0.15) !important;
+  color: #b0703c !important;
+  border: 1px solid rgba(150, 75, 0, 0.3);
+}
+
+.badge-other {
+  background-color: rgba(156, 163, 175, 0.15) !important;
+  color: var(--text-muted) !important;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
+/* Kanban recruitment stages */
+.kanban-column {
+  background: rgba(15, 18, 27, 0.4);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  min-height: 500px;
+}
+
+/* Task Checkbox */
+.task-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid var(--primary-neon);
+  cursor: pointer;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.task-checkbox:checked {
+  background: var(--primary-neon);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+
+.task-checkbox:checked::after {
+  content: "✓";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.task-completed-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+/* Layout wrapping styles */
+.app-container {
+  display: flex;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 30px;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+/* Mobile responsive navigation toggles */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -250px;
+    height: 100vh;
+  }
+  .sidebar.active {
+    left: 0;
+  }
+  .main-content {
+    padding: 15px;
+  }
+}
