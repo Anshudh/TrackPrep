@@ -1,4 +1,6 @@
 import { query } from '../config/db.js';
+import cacheService from './cacheService.js';
+import eventService from './eventService.js';
 
 class ProblemService {
   async getProblems(userId, { search, platform, difficulty, topic } = {}) {
@@ -57,6 +59,13 @@ class ProblemService {
       problem_url || null
     ];
     const result = await query(sql, params);
+
+    // Invalidate cached statistics
+    await cacheService.clearUserCache(userId);
+
+    // Emit live activity feed event
+    eventService.emitActivity(userId, 'solved a problem', `${title} (${platform || 'Other'})`);
+
     return result.rows[0];
   }
 
@@ -78,16 +87,34 @@ class ProblemService {
       userId
     ];
     const result = await query(sql, params);
+
+    if (result.rows[0]) {
+      // Invalidate cached statistics
+      await cacheService.clearUserCache(userId);
+      eventService.emitActivity(userId, 'updated a solved problem', `${result.rows[0].title}`);
+    }
+
     return result.rows[0];
   }
 
   async deleteProblem(userId, problemId) {
     const sql = `DELETE FROM problems WHERE id = $1 AND user_id = $2 RETURNING *`;
     const result = await query(sql, [problemId, userId]);
+
+    if (result.rowCount > 0) {
+      // Invalidate cached statistics
+      await cacheService.clearUserCache(userId);
+      eventService.emitActivity(userId, 'removed a solved problem', `${result.rows[0].title}`);
+    }
+
     return result.rowCount > 0;
   }
 
   async getDifficultyStats(userId) {
+    const cacheKey = `user:${userId}:problem_difficulty_stats`;
+    const cached = await cacheService.get(cacheKey);
+    if (cached) return cached;
+
     const sql = `
       SELECT difficulty, COUNT(*) as count 
       FROM problems 
@@ -95,10 +122,16 @@ class ProblemService {
       GROUP BY difficulty
     `;
     const result = await query(sql, [userId]);
-    return result.rows; // [{ difficulty: 'Easy', count: 12 }, ...]
+    const stats = result.rows;
+    await cacheService.set(cacheKey, stats, 300); // 5 min TTL
+    return stats;
   }
 
   async getTopicStats(userId) {
+    const cacheKey = `user:${userId}:problem_topic_stats`;
+    const cached = await cacheService.get(cacheKey);
+    if (cached) return cached;
+
     const sql = `
       SELECT topic, COUNT(*) as count 
       FROM problems 
@@ -106,13 +139,21 @@ class ProblemService {
       GROUP BY topic
     `;
     const result = await query(sql, [userId]);
-    return result.rows; // [{ topic: 'Array', count: 8 }, ...]
+    const stats = result.rows;
+    await cacheService.set(cacheKey, stats, 300); // 5 min TTL
+    return stats;
   }
 
   async getTotalCount(userId) {
+    const cacheKey = `user:${userId}:problem_total_count`;
+    const cached = await cacheService.get(cacheKey);
+    if (cached !== null) return cached;
+
     const sql = `SELECT COUNT(*) as count FROM problems WHERE user_id = $1`;
     const result = await query(sql, [userId]);
-    return parseInt(result.rows[0].count || '0');
+    const count = parseInt(result.rows[0].count || '0');
+    await cacheService.set(cacheKey, count, 300);
+    return count;
   }
 }
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchDashboardStats } from '../services/api';
+import { useSocket } from '../services/socket';
 import { 
   Code2, 
   Briefcase, 
@@ -26,6 +27,88 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const socket = useSocket();
+  const [activities, setActivities] = useState([]);
+  const [joinedRoom, setJoinedRoom] = useState(null);
+  const [roomName, setRoomName] = useState('');
+  const [roomMessages, setRoomMessages] = useState([]);
+  const [progressMsg, setProgressMsg] = useState('');
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleActivity = (activity) => {
+      setActivities((prev) => [activity, ...prev].slice(0, 10));
+    };
+
+    const handleRoomMessage = (msg) => {
+      setRoomMessages((prev) => [...prev, msg]);
+    };
+
+    socket.on('live_activity', handleActivity);
+    socket.on('room_message', handleRoomMessage);
+
+    let timer;
+    if (socket && !socket.io) {
+      // Setup a periodic timer for simulated activities in mock mode
+      const mockUsers = ['AliceCoder', 'BobDev', 'CodeMaster9', 'ViteFanatic', 'Algopreneur'];
+      const mockActions = [
+        { text: 'solved a problem', title: 'Two Sum (LeetCode)' },
+        { text: 'added an application', title: 'Meta - Frontend Engineer' },
+        { text: 'completed a task', title: 'Revise sliding window patterns' },
+        { text: 'solved a problem', title: 'Merge K Sorted Lists (LeetCode)' },
+        { text: 'added an application', title: 'Stripe - Software Engineer' }
+      ];
+
+      timer = setInterval(() => {
+        const user = mockUsers[Math.floor(Math.random() * mockUsers.length)];
+        const action = mockActions[Math.floor(Math.random() * mockActions.length)];
+        const simulatedActivity = {
+          userId: 999,
+          userName: user,
+          actionText: action.text,
+          entityTitle: action.title,
+          timeString: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: new Date().toISOString()
+        };
+        handleActivity(simulatedActivity);
+      }, 15000);
+    }
+
+    return () => {
+      socket.off('live_activity', handleActivity);
+      socket.off('room_message', handleRoomMessage);
+      if (timer) clearInterval(timer);
+    };
+  }, [socket]);
+
+  const joinRoom = (e) => {
+    e.preventDefault();
+    if (!roomName.trim() || !socket) return;
+    socket.emit('join_room', roomName);
+    setJoinedRoom(roomName);
+    setRoomMessages([]);
+  };
+
+  const leaveRoom = () => {
+    if (!socket || !joinedRoom) return;
+    socket.emit('leave_room', joinedRoom);
+    setJoinedRoom(null);
+    setRoomName('');
+    setRoomMessages([]);
+  };
+
+  const sendProgressUpdate = (e) => {
+    e.preventDefault();
+    if (!progressMsg.trim() || !socket || !joinedRoom) return;
+    socket.emit('send_room_message', {
+      room: joinedRoom,
+      text: progressMsg,
+      sender: 'Me'
+    });
+    setProgressMsg('');
+  };
 
   useEffect(() => {
     const getStats = async () => {
@@ -302,6 +385,101 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Real-time Collaboration Section */}
+      <div className="row g-4 mt-3">
+        {/* Live Activity Feed */}
+        <div className="col-12 col-lg-6">
+          <div className="glass-card p-4 h-100">
+            <h5 className="text-white mb-4 fw-bold d-flex align-items-center gap-2">
+              <span className="position-relative d-inline-block" style={{ width: '10px', height: '10px' }}>
+                <span className="position-absolute top-50 start-50 translate-middle p-1 bg-success rounded-circle animate-ping" style={{ width: '100%', height: '100%', opacity: 0.75 }}></span>
+                <span className="position-absolute top-50 start-50 translate-middle p-1 bg-success border border-light rounded-circle" style={{ width: '8px', height: '8px' }}></span>
+              </span>
+              Live Activity Feed
+            </h5>
+            
+            <div className="activity-list overflow-auto pr-2" style={{ maxHeight: '280px', minHeight: '200px' }}>
+              {activities.length === 0 ? (
+                <div className="d-flex align-items-center justify-content-center h-100 text-muted small py-5">
+                  Waiting for activity events...
+                </div>
+              ) : (
+                activities.map((act, idx) => (
+                  <div key={idx} className="p-3 mb-2 rounded-3 border border-light border-opacity-10 bg-white bg-opacity-5 d-flex justify-content-between align-items-center animate-fade-in">
+                    <div>
+                      <span className="fw-semibold text-white">{act.userName || 'Someone'}</span>{' '}
+                      <span className="text-muted">{act.actionText}</span>{' '}
+                      <span className="fw-medium text-neon-secondary">{act.entityTitle}</span>
+                    </div>
+                    <span className="text-muted small ms-2" style={{ fontSize: '0.75rem' }}>{act.timeString}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Study Groups */}
+        <div className="col-12 col-lg-6">
+          <div className="glass-card p-4 h-100">
+            <h5 className="text-white mb-3 fw-bold d-flex align-items-center gap-2">
+              <Compass size={18} className="text-neon-secondary" /> Study Groups (Socket.io Rooms)
+            </h5>
+            
+            {joinedRoom ? (
+              <div>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span className="text-muted small">Connected to Room:</span>
+                    <h6 className="text-neon-glow mb-0 fw-bold">{joinedRoom}</h6>
+                  </div>
+                  <button onClick={leaveRoom} className="btn btn-outline-danger btn-sm px-3">Leave Room</button>
+                </div>
+                
+                <div className="room-messages overflow-auto mb-3 p-3 rounded-3 border border-light border-opacity-10 bg-black bg-opacity-20" style={{ maxHeight: '160px', minHeight: '130px' }}>
+                  {roomMessages.length === 0 ? (
+                    <div className="text-muted small text-center py-4">No recent room updates. Share your progress!</div>
+                  ) : (
+                    roomMessages.map((msg, idx) => (
+                      <div key={idx} className="mb-2 text-white small">
+                        <span className="text-neon-secondary fw-semibold">{msg.sender}: </span>
+                        <span>{msg.text}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+                
+                <form onSubmit={sendProgressUpdate} className="d-flex gap-2">
+                  <input
+                    type="text"
+                    value={progressMsg}
+                    onChange={(e) => setProgressMsg(e.target.value)}
+                    placeholder="Share your task or stats..."
+                    className="form-control form-control-glass py-2 text-white"
+                  />
+                  <button type="submit" className="btn btn-neon-primary px-3">Send</button>
+                </form>
+              </div>
+            ) : (
+              <div className="py-2">
+                <p className="text-muted small">Join a study group room to connect and share progress with peers in real time.</p>
+                <form onSubmit={joinRoom} className="d-flex gap-2 mt-3">
+                  <input
+                    type="text"
+                    value={roomName}
+                    onChange={(e) => setRoomName(e.target.value)}
+                    placeholder="Enter Room Name (e.g. FAANG_Prep)"
+                    className="form-control form-control-glass py-2 text-white"
+                    required
+                  />
+                  <button type="submit" className="btn btn-neon-secondary px-4">Join Room</button>
+                </form>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

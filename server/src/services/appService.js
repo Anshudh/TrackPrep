@@ -1,4 +1,6 @@
 import { query } from '../config/db.js';
+import cacheService from './cacheService.js';
+import eventService from './eventService.js';
 
 class ApplicationService {
   async getApplications(userId, { status } = {}) {
@@ -36,6 +38,13 @@ class ApplicationService {
       notes || null
     ];
     const result = await query(sql, params);
+
+    // Invalidate cached statistics
+    await cacheService.clearUserCache(userId);
+
+    // Emit live activity feed event
+    eventService.emitActivity(userId, 'added an application', `${company} - ${role}`);
+
     return result.rows[0];
   }
 
@@ -56,16 +65,38 @@ class ApplicationService {
       userId
     ];
     const result = await query(sql, params);
+
+    if (result.rows[0]) {
+      // Invalidate cached statistics
+      await cacheService.clearUserCache(userId);
+
+      // Emit live activity feed event
+      eventService.emitActivity(userId, 'updated application stage to', `${status} for ${result.rows[0].company}`);
+    }
+
     return result.rows[0];
   }
 
   async deleteApplication(userId, applicationId) {
     const sql = `DELETE FROM applications WHERE id = $1 AND user_id = $2 RETURNING *`;
     const result = await query(sql, [applicationId, userId]);
+
+    if (result.rowCount > 0) {
+      // Invalidate cached statistics
+      await cacheService.clearUserCache(userId);
+
+      // Emit live activity feed event
+      eventService.emitActivity(userId, 'removed an application', `${result.rows[0].company}`);
+    }
+
     return result.rowCount > 0;
   }
 
   async getStatusStats(userId) {
+    const cacheKey = `user:${userId}:app_status_stats`;
+    const cached = await cacheService.get(cacheKey);
+    if (cached) return cached;
+
     const sql = `
       SELECT status, COUNT(*) as count 
       FROM applications 
@@ -73,13 +104,21 @@ class ApplicationService {
       GROUP BY status
     `;
     const result = await query(sql, [userId]);
-    return result.rows; // [{ status: 'Applied', count: 5 }, ...]
+    const stats = result.rows;
+    await cacheService.set(cacheKey, stats, 300); // 5 min TTL
+    return stats;
   }
 
   async getTotalCount(userId) {
+    const cacheKey = `user:${userId}:app_total_count`;
+    const cached = await cacheService.get(cacheKey);
+    if (cached !== null) return cached;
+
     const sql = `SELECT COUNT(*) as count FROM applications WHERE user_id = $1`;
     const result = await query(sql, [userId]);
-    return parseInt(result.rows[0].count || '0');
+    const count = parseInt(result.rows[0].count || '0');
+    await cacheService.set(cacheKey, count, 300);
+    return count;
   }
 }
 

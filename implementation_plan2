@@ -1,0 +1,104 @@
+# Modular Codebase Enhancements for Future Upgrades
+
+This implementation plan covers structural changes to ensure TrackPrep is modular enough to easily adopt Redis caching (Phase 2), Socket.io real-time updates (Phase 3), complete Dockerization including Redis (Phase 4), and various analytical or scheduling features (Phase 5) without needing modifications to core controllers or schemas later.
+
+---
+
+## User Review Required
+
+> [!NOTE]
+> Since command line tools (PowerShell) on the local host are failing to resolve in this sandbox execution environment, we cannot run Git commands directly to create the branch or commit changes. We will carry out all modifications directly in the workspace files. Once we finish, you can run the following Git commands in your terminal:
+> ```bash
+> git checkout -b feature/modular-upgrades
+> git add .
+> git commit -m "refactor: make codebase modular for Redis, Socket.io, Docker, and other enhancements"
+> git push origin feature/modular-upgrades
+> ```
+
+---
+
+## Proposed Changes
+
+### Backend Caching (Phase 2)
+
+#### [NEW] [cacheService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/cacheService.js)
+Create a unified caching interface. It will check for `REDIS_URL` or `REDIS_HOST`/`REDIS_PORT` env variables and attempt a dynamic import of the `'redis'` client. If not configured or not installed, it falls back to an in-memory `Map` storage with TTL timeouts, enabling cache functionality out-of-the-box.
+
+#### [MODIFY] [problemService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/problemService.js)
+Integrate `cacheService` inside statistics and listing queries (`getDifficultyStats`, `getTopicStats`, `getTotalCount`). Add cache invalidation calls (`cacheService.clearUserCache(userId)`) on `addProblem`, `updateProblem`, and `deleteProblem`.
+
+#### [MODIFY] [appService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/appService.js)
+Integrate `cacheService` in stats queries (`getStatusStats`, `getTotalCount`). Invalidate cache on mutations (`addApplication`, `updateApplication`, `deleteApplication`).
+
+#### [MODIFY] [taskService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/taskService.js)
+Integrate caching for pending counts (`getPendingCount`) and invalidate cache on mutations (`addTask`, `updateTask`, `deleteTask`).
+
+---
+
+### Backend Real-time Events (Phase 3)
+
+#### [NEW] [eventService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/eventService.js)
+An event manager extending Node.js's native `EventEmitter`. It acts as the bridge between database services and real-time outputs. It provides an initialization hook for a Socket.io server to listen to actions and broadcast them to clients.
+
+#### [NEW] [socket.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/config/socket.js)
+A setup configuration that dynamically checks if `'socket.io'` is installed. If installed, it binds Socket.io to the HTTP server and registers connection event hooks (rooms, messages) via `eventService`. If not installed, it yields a warnings-only stub, maintaining backward compatibility.
+
+#### [MODIFY] [problemService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/problemService.js)
+Import `eventService` and emit an event when a user solves a problem.
+
+#### [MODIFY] [appService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/appService.js)
+Import `eventService` and emit an event when a user logs an application.
+
+#### [MODIFY] [taskService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/taskService.js)
+Import `eventService` and emit an event when a user completes a task.
+
+#### [MODIFY] [index.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/index.js)
+Import `setupSocketIO` and bind it to the running HTTP server.
+
+---
+
+### Frontend Real-time UI (Phase 3)
+
+#### [NEW] [socket.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/client/src/services/socket.js)
+A client-side socket helper that dynamically checks for `'socket.io-client'`. If not present, it loads a Mock Socket implementation that supports local events/callbacks (facilitating mockup simulations and previewing the live feed). If present, it connects to the backend Socket.io server. Includes a `useSocket()` hook.
+
+#### [MODIFY] [Dashboard.jsx](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/client/src/pages/Dashboard.jsx)
+Integrate the Live Activity Feed and Study Groups (Rooms) visual components below the analytics charts. Bind them to socket events:
+1. `live_activity` - Appends real-time notifications to the live feed.
+2. `join_room` / `leave_room` - Permits entering a study group chat room.
+Includes simulation features that display simulated peer activity updates if real Socket.io clients aren't installed/active.
+
+---
+
+### Docker & Config (Phase 4)
+
+#### [MODIFY] [docker-compose.yml](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/docker-compose.yml)
+Add a standard `redis:7-alpine` container configuration alongside `db`, `server`, and `client`. Pass `REDIS_HOST=redis` and `REDIS_PORT=6379` env configurations to the backend service.
+
+---
+
+### Background Scheduling & Analytical Features (Phase 5 Skeletons)
+
+#### [NEW] [emailService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/emailService.js)
+A helper class using `nodemailer` (if installed) or logging mail payloads directly to stdout in dev modes.
+
+#### [NEW] [jobService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/jobService.js)
+Uses `node-cron` (dynamically imported) or a `setInterval` fallback to structure cron schedules for weekly reports and daily email reminders for pending tasks. Started at `index.js` bootstrap and cleaned up on shutdown.
+
+#### [NEW] [githubService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/githubService.js)
+A modular integration API service using `axios` to query profile details or repository commits for profile integrations.
+
+#### [NEW] [pdfService.js](file:///C:/Users/anshu/OneDrive/Desktop/TrackPrep/server/src/services/pdfService.js)
+A PDF exporter wrapper utilizing `pdfkit` (dynamically imported) or returning structured text summaries in a buffer fallback, ready for use.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+* We will start the server using `npm run dev` to verify that the mock fallbacks load correctly without throwing module resolution errors or missing package exceptions.
+
+### Manual Verification
+* Access the UI at `http://localhost:5173`.
+* Navigate to the **Problems**, **Applications**, or **Planner** pages and complete actions (add a problem, move an application, check off a task). Return to the dashboard and confirm that the local feed logs the activity immediately.
+* Use the Study Groups card to join a room and send updates, validating the UI state response.

@@ -1,5 +1,7 @@
 import app from './app.js';
 import dotenv from 'dotenv';
+import { setupSocketIO } from './config/socket.js';
+import jobService from './services/jobService.js';
 
 dotenv.config();
 
@@ -17,9 +19,19 @@ const server = app.listen(PORT, () => {
   console.log(`========================================`);
 });
 
+// Initialize Socket.io configuration
+setupSocketIO(server);
+
+// Start background schedulers (Phase 5 skeleton)
+jobService.startBackgroundJobs();
+
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM signal received. Shutting down gracefully...');
+  
+  // Stop and clean up background scheduler processes
+  jobService.stopAllJobs();
+
   server.close(() => {
     console.log('HTTP server closed.');
     process.exit(0);
