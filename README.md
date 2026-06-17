@@ -1,4 +1,4 @@
-# 🎯 TrackPrep
+# TrackPrep
 
 TrackPrep is a full-stack student dashboard platform to track practice coding problems, recruitment job pipelines, and study schedules.
 
