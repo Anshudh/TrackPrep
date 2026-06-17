@@ -28,7 +28,7 @@ const Login = () => {
   if (loading) {
     return (
       <div className="d-flex align-items-center justify-content-center min-vh-100">
-        <div className="spinner-border text-primary" role="status">
+        <div className="spinner-border text-neon-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
@@ -52,7 +52,7 @@ const Login = () => {
         {/* Features Column */}
         <div className="col-12 col-md-6 d-flex flex-column gap-3">
           <div className="glass-card p-4 d-flex align-items-start gap-4">
-            <div className="bg-primary bg-opacity-10 p-3 rounded-3 text-primary border border-primary border-opacity-20">
+            <div className="theme-icon-primary p-3 rounded-3">
               <Code2 size={28} />
             </div>
             <div>
@@ -62,7 +62,7 @@ const Login = () => {
           </div>
 
           <div className="glass-card p-4 d-flex align-items-start gap-4">
-            <div className="bg-info bg-opacity-10 p-3 rounded-3 text-info border border-info border-opacity-20">
+            <div className="theme-icon-secondary p-3 rounded-3">
               <Briefcase size={28} />
             </div>
             <div>
@@ -72,7 +72,7 @@ const Login = () => {
           </div>
 
           <div className="glass-card p-4 d-flex align-items-start gap-4">
-            <div className="bg-warning bg-opacity-10 p-3 rounded-3 text-warning border border-warning border-opacity-20">
+            <div className="theme-icon-success p-3 rounded-3">
               <CalendarCheck size={28} />
             </div>
             <div>
@@ -86,8 +86,7 @@ const Login = () => {
         <div className="col-12 col-md-5 d-flex">
           <div className="glass-card p-5 d-flex flex-column justify-content-center text-center w-100">
             <div className="mb-4">
-              <span className="fs-1">🎯</span>
-              <h3 className="text-white mt-3 fw-bold">Welcome to TrackPrep</h3>
+              <h3 className="text-white fw-bold">Welcome to TrackPrep</h3>
               <p className="text-muted small">Access your account to check metrics progress</p>
             </div>
 

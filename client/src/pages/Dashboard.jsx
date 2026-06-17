@@ -132,17 +132,17 @@ const Dashboard = () => {
 
   // Preset Colors for charts
   const DIFFICULTY_COLORS = {
-    Easy: '#10b981',   // Emerald
-    Medium: '#f59e0b', // Amber
-    Hard: '#ef4444',   // Rose
+    Easy: '#8da891',   // Sage Green
+    Medium: '#dfb17b', // Champagne Gold
+    Hard: '#d67b73',   // Terracotta Red
   };
 
   const STATUS_COLORS = {
-    Applied: '#3b82f6',   // Blue
-    OA: '#8b5cf6',        // Purple
-    Interview: '#06b6d4', // Cyan
-    Rejected: '#ef4444',  // Red
-    Offer: '#10b981',     // Emerald
+    Applied: '#a69a8f',   // Warm Taupe
+    OA: '#c49c74',        // Sandy Ochre
+    Interview: '#c5a880', // Warm Bronze
+    Rejected: '#cd6b65',  // Muted Rust
+    Offer: '#8da891',     // Sage Green
   };
 
   if (loading) {
@@ -210,7 +210,7 @@ const Dashboard = () => {
       <div className="row g-4 mb-5">
         <div className="col-12 col-md-4">
           <div className="glass-card glass-card-hover p-4 d-flex align-items-center gap-4">
-            <div className="p-3 rounded-4" style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#8b5cf6' }}>
+            <div className="p-3 rounded-4 theme-icon-primary">
               <Code2 size={32} />
             </div>
             <div>
@@ -222,7 +222,7 @@ const Dashboard = () => {
 
         <div className="col-12 col-md-4">
           <div className="glass-card glass-card-hover p-4 d-flex align-items-center gap-4">
-            <div className="p-3 rounded-4" style={{ backgroundColor: 'rgba(6, 182, 212, 0.15)', border: '1px solid rgba(6, 182, 212, 0.3)', color: '#06b6d4' }}>
+            <div className="p-3 rounded-4 theme-icon-secondary">
               <Briefcase size={32} />
             </div>
             <div>
@@ -234,7 +234,7 @@ const Dashboard = () => {
 
         <div className="col-12 col-md-4">
           <div className="glass-card glass-card-hover p-4 d-flex align-items-center gap-4">
-            <div className="p-3 rounded-4" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#10b981' }}>
+            <div className="p-3 rounded-4 theme-icon-success">
               <CalendarCheck size={32} />
             </div>
             <div>
@@ -371,8 +371,8 @@ const Dashboard = () => {
                       {/* Gradient definition */}
                       <defs>
                         <linearGradient id="colorTopicBar" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.9} />
-                          <stop offset="100%" stopColor="#06b6d4" stopOpacity={0.3} />
+                          <stop offset="0%" stopColor="var(--primary-neon)" stopOpacity={0.9} />
+                          <stop offset="100%" stopColor="var(--secondary-neon)" stopOpacity={0.3} />
                         </linearGradient>
                       </defs>
                     </BarChart>

@@ -19,7 +19,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       {/* Brand Header */}
       <div className="d-flex align-items-center justify-content-between mb-4 px-2">
         <span className="fs-4 fw-extrabold text-neon-glow d-flex align-items-center gap-2">
-          🎯 TrackPrep
+          TrackPrep
         </span>
         <button 
           className="btn btn-sm btn-outline-secondary d-md-none" 

@@ -55,7 +55,7 @@ const AppLayout = () => {
       <div className="main-content">
         {/* Mobile Header Navigation */}
         <div className="d-md-none d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom" style={{ borderColor: 'var(--card-border)' }}>
-          <span className="fs-5 fw-extrabold text-neon-glow">🎯 TrackPrep</span>
+          <span className="fs-5 fw-extrabold text-neon-glow">TrackPrep</span>
           <button 
             className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
             onClick={() => toggleSidebar(true)}

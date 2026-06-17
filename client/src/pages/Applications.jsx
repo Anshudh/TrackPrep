@@ -13,11 +13,11 @@ import {
 const STAGES = ['Applied', 'OA', 'Interview', 'Offer', 'Rejected'];
 
 const STAGE_HEADER_COLORS = {
-  Applied: 'border-top: 3px solid #3b82f6',
-  OA: 'border-top: 3px solid #8b5cf6',
-  Interview: 'border-top: 3px solid #06b6d4',
-  Offer: 'border-top: 3px solid #10b981',
-  Rejected: 'border-top: 3px solid #ef4444'
+  Applied: 'border-top: 3px solid var(--secondary-neon)',
+  OA: 'border-top: 3px solid var(--accent-warning)',
+  Interview: 'border-top: 3px solid var(--primary-neon)',
+  Offer: 'border-top: 3px solid var(--accent-success)',
+  Rejected: 'border-top: 3px solid var(--accent-danger)'
 };
 
 const Applications = () => {
@@ -154,7 +154,7 @@ const Applications = () => {
 
       {loading ? (
         <div className="text-center py-5">
-          <div className="spinner-border text-primary" role="status">
+          <div className="spinner-border text-neon-primary" role="status">
             <span className="visually-hidden">Loading applications...</span>
           </div>
         </div>

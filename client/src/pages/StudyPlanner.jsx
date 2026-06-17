@@ -159,7 +159,7 @@ const StudyPlanner = () => {
       <div className="glass-card p-4">
         {loading ? (
           <div className="text-center py-5">
-            <div className="spinner-border text-primary" role="status">
+            <div className="spinner-border text-neon-primary" role="status">
               <span className="visually-hidden">Loading tasks...</span>
             </div>
           </div>
