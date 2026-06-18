@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Code2, Briefcase, CalendarCheck, ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
+import MagicBento from '../components/MagicBento';
 
 const Login = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -49,41 +50,25 @@ const Login = () => {
       </div>
 
       <div className="row w-100 justify-content-center align-items-stretch g-4">
-        {/* Features Column */}
-        <div className="col-12 col-md-6 d-flex flex-column gap-3">
-          <div className="glass-card p-4 d-flex align-items-start gap-4">
-            <div className="theme-icon-primary p-3 rounded-3">
-              <Code2 size={28} />
-            </div>
-            <div>
-              <h5 className="text-white mb-1">Problem Tracker</h5>
-              <p className="text-muted mb-0 small">Log solved problems from LeetCode, Codeforces, and CodeChef. Filter by topic and difficulty.</p>
-            </div>
-          </div>
-
-          <div className="glass-card p-4 d-flex align-items-start gap-4">
-            <div className="theme-icon-secondary p-3 rounded-3">
-              <Briefcase size={28} />
-            </div>
-            <div>
-              <h5 className="text-white mb-1">Application Funnel</h5>
-              <p className="text-muted mb-0 small">Track internship/full-time job applications from first apply to final offer with pipeline stages.</p>
-            </div>
-          </div>
-
-          <div className="glass-card p-4 d-flex align-items-start gap-4">
-            <div className="theme-icon-success p-3 rounded-3">
-              <CalendarCheck size={28} />
-            </div>
-            <div>
-              <h5 className="text-white mb-1">Study Planner</h5>
-              <p className="text-muted mb-0 small">Add tasks and review schedules. Keep your preparation checklist updated on time.</p>
-            </div>
-          </div>
+        {/* Features Column - MagicBento Interactive Grid */}
+        <div className="col-12 col-lg-7 d-flex align-items-center justify-content-center">
+          <MagicBento 
+            textAutoHide={true}
+            enableStars={true}
+            enableSpotlight={true}
+            enableBorderGlow={true}
+            enableTilt={true}
+            enableMagnetism={true}
+            clickEffect={true}
+            spotlightRadius={300}
+            particleCount={12}
+            glowColor="224, 169, 109"
+            disableAnimations={false}
+          />
         </div>
 
         {/* Login Column */}
-        <div className="col-12 col-md-5 d-flex">
+        <div className="col-12 col-lg-5 d-flex align-items-center">
           <div className="glass-card p-5 d-flex flex-column justify-content-center text-center w-100">
             <div className="mb-4">
               <h3 className="text-white fw-bold">Welcome to TrackPrep</h3>
