@@ -49,37 +49,9 @@ const Dashboard = () => {
     socket.on('live_activity', handleActivity);
     socket.on('room_message', handleRoomMessage);
 
-    let timer;
-    if (socket && !socket.io) {
-      // Setup a periodic timer for simulated activities in mock mode
-      const mockUsers = ['AliceCoder', 'BobDev', 'CodeMaster9', 'ViteFanatic', 'Algopreneur'];
-      const mockActions = [
-        { text: 'solved a problem', title: 'Two Sum (LeetCode)' },
-        { text: 'added an application', title: 'Meta - Frontend Engineer' },
-        { text: 'completed a task', title: 'Revise sliding window patterns' },
-        { text: 'solved a problem', title: 'Merge K Sorted Lists (LeetCode)' },
-        { text: 'added an application', title: 'Stripe - Software Engineer' }
-      ];
-
-      timer = setInterval(() => {
-        const user = mockUsers[Math.floor(Math.random() * mockUsers.length)];
-        const action = mockActions[Math.floor(Math.random() * mockActions.length)];
-        const simulatedActivity = {
-          userId: 999,
-          userName: user,
-          actionText: action.text,
-          entityTitle: action.title,
-          timeString: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          timestamp: new Date().toISOString()
-        };
-        handleActivity(simulatedActivity);
-      }, 15000);
-    }
-
     return () => {
       socket.off('live_activity', handleActivity);
       socket.off('room_message', handleRoomMessage);
-      if (timer) clearInterval(timer);
     };
   }, [socket]);
 

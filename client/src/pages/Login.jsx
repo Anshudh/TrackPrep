@@ -16,14 +16,16 @@ const Login = () => {
     }
   }, [isAuthenticated, loading, navigate]);
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   const handleGoogleLogin = () => {
     // Redirect direct to express server Google auth route
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    window.location.href = `${backendUrl}/api/auth/google`;
   };
 
   const handleMockLogin = () => {
     // Redirect direct to express server mock auth route
-    window.location.href = 'http://localhost:5000/api/auth/mock';
+    window.location.href = `${backendUrl}/api/auth/mock`;
   };
 
   if (loading) {
@@ -96,22 +98,26 @@ const Login = () => {
                 Continue with Google
               </button>
 
-              <div className="position-relative my-2 d-flex align-items-center">
-                <hr className="w-100 border-secondary opacity-25" />
-                <span className="position-absolute bg-dark px-3 text-muted small start-50 translate-middle">OR</span>
-              </div>
+              {import.meta.env.DEV && (
+                <>
+                  <div className="position-relative my-2 d-flex align-items-center">
+                    <hr className="w-100 border-secondary opacity-25" />
+                    <span className="position-absolute bg-dark px-3 text-muted small start-50 translate-middle">OR</span>
+                  </div>
 
-              <button 
-                onClick={handleMockLogin} 
-                className="btn btn-neon-primary py-3 px-4 d-flex align-items-center justify-content-center gap-2"
-              >
-                <ShieldCheck size={20} />
-                <span>Developer Mock Login</span>
-              </button>
-              
-              <small className="text-muted mt-2" style={{ fontSize: '0.75rem' }}>
-                Use mock login to test immediately without setting up API credentials.
-              </small>
+                  <button 
+                    onClick={handleMockLogin} 
+                    className="btn btn-neon-primary py-3 px-4 d-flex align-items-center justify-content-center gap-2"
+                  >
+                    <ShieldCheck size={20} />
+                    <span>Developer Mock Login</span>
+                  </button>
+                  
+                  <small className="text-muted mt-2" style={{ fontSize: '0.75rem' }}>
+                    Use mock login to test immediately without setting up API credentials.
+                  </small>
+                </>
+              )}
             </div>
           </div>
         </div>

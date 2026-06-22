@@ -16,8 +16,9 @@ export const checkAuthStatus = async () => {
 };
 
 export const logoutUser = async () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
   // Directly trigger backend redirection
-  window.location.href = 'http://localhost:5000/api/auth/logout';
+  window.location.href = `${backendUrl}/api/auth/logout`;
 };
 
 // Dashboard Stats API
