@@ -17,6 +17,9 @@ import taskRoutes from './routes/taskRoutes.js';
 
 const app = express();
 
+// Enable trust proxy for secure cookies and correct redirect protocol detection behind reverse proxies (Railway)
+app.set('trust proxy', 1);
+
 // 1. Security Headers via Helmet
 app.use(
   helmet({
