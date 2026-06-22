@@ -1,8 +1,8 @@
 import eventService from '../services/eventService.js';
+import { Server } from 'socket.io';
 
-export async function setupSocketIO(server) {
+export function setupSocketIO(server) {
   try {
-    const { Server } = await import('socket.io');
     const io = new Server(server, {
       cors: {
         origin: process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -15,7 +15,7 @@ export async function setupSocketIO(server) {
     console.log('Socket.io configuration registered and initialized.');
     return io;
   } catch (error) {
-    console.warn('Socket.io module is not installed. Real-time Socket.io connections are disabled. Fallback to in-process event emittance.', error.message);
+    console.warn('Socket.io failed to initialize. Real-time connections are disabled.', error.message);
     return null;
   }
 }
