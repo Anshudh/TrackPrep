@@ -15,10 +15,4 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    rollupOptions: {
-      // Treat socket.io-client as external so building succeeds without it installed
-      external: ['socket.io-client'],
-    },
-  },
 });
