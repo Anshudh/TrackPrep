@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
 // Create Axios Instance
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${backendUrl}/api`,
   withCredentials: true, // Crucial for session cookie transmission
   headers: {
     'Content-Type': 'application/json',
