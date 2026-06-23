@@ -37,7 +37,11 @@ app.use(
 );
 
 // 2. CORS configuration (allowing React app requests with cookies)
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+let frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+if (frontendUrl.endsWith('/')) {
+  frontendUrl = frontendUrl.slice(0, -1);
+}
+
 app.use(
   cors({
     origin: frontendUrl,
@@ -65,6 +69,9 @@ try {
   console.warn('Postgres session storage initialization failed. Falling back to MemoryStore.', err.message);
 }
 
+const isProduction = process.env.NODE_ENV === 'production' || 
+                     (process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost'));
+
 app.use(
   session({
     store: store,
@@ -74,8 +81,8 @@ app.use(
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
     },
   })
 );
