@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchDashboardStats } from '../services/api';
 import { useSocket } from '../services/socket';
+import { useAuth } from '../context/AuthContext';
 import { 
   Code2, 
   Briefcase, 
@@ -24,6 +25,7 @@ import {
 } from 'recharts';
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -77,7 +79,7 @@ const Dashboard = () => {
     socket.emit('send_room_message', {
       room: joinedRoom,
       text: progressMsg,
-      sender: 'Me'
+      sender: user?.name || 'Me'
     });
     setProgressMsg('');
   };
@@ -384,7 +386,9 @@ const Dashboard = () => {
                       <span className="text-muted">{act.actionText}</span>{' '}
                       <span className="fw-medium text-neon-secondary">{act.entityTitle}</span>
                     </div>
-                    <span className="text-muted small ms-2" style={{ fontSize: '0.75rem' }}>{act.timeString}</span>
+                    <span className="text-muted small ms-2" style={{ fontSize: '0.75rem' }}>
+                      {act.timestamp ? new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : act.timeString}
+                    </span>
                   </div>
                 ))
               )}
