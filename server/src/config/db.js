@@ -5,13 +5,19 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const poolConfig = {
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_DATABASE || 'trackprep',
-};
+const poolConfig = process.env.DATABASE_URL
+  ? { 
+      connectionString: process.env.DATABASE_URL,
+      // If connecting to Railway database from outside or with SSL requirement
+      ssl: process.env.DATABASE_URL.includes('railway') ? { rejectUnauthorized: false } : false
+    }
+  : {
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      database: process.env.DB_DATABASE || 'trackprep',
+    };
 
 const pool = new Pool(poolConfig);
 
