@@ -43,7 +43,7 @@ const initSchema = async (clientPool) => {
 
     if (!tableExists) {
       console.log('Database tables not found. Loading schema from schema.sql...');
-      const schemaPath = path.join(__dirname, '..', '..', '..', 'database', 'schema.sql');
+      const schemaPath = path.join(__dirname, 'schema.sql');
       const schemaSql = fs.readFileSync(schemaPath, 'utf8');
       
       // Execute the schema script
