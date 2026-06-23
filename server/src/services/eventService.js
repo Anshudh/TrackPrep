@@ -6,12 +6,34 @@ class EventService extends EventEmitter {
     this.io = null;
   }
 
+  getActiveRooms() {
+    if (!this.io) return [];
+    const rooms = this.io.sockets.adapter.rooms;
+    const sids = this.io.sockets.adapter.sids;
+    const activeRooms = [];
+
+    for (const [room, participants] of rooms.entries()) {
+      // If the room name is in sids, it means it's a private individual socket room
+      if (sids.has(room)) {
+        continue;
+      }
+      activeRooms.push({
+        name: room,
+        count: participants.size
+      });
+    }
+    return activeRooms;
+  }
+
   initSocketIO(io) {
     this.io = io;
     console.log('Socket.io integrated with EventService.');
 
     this.io.on('connection', (socket) => {
       console.log(`Socket client connected: ${socket.id}`);
+
+      // Send initial active rooms to client
+      socket.emit('rooms_update', this.getActiveRooms());
 
       // Handle joining a study group room
       socket.on('join_room', (room) => {
@@ -20,6 +42,9 @@ class EventService extends EventEmitter {
         
         // Notify other members in the study room
         socket.to(room).emit('user_joined', { socketId: socket.id });
+
+        // Broadcast updated room list
+        this.io.emit('rooms_update', this.getActiveRooms());
       });
 
       // Handle sharing message or updates in study group room
@@ -41,10 +66,15 @@ class EventService extends EventEmitter {
         console.log(`Socket client ${socket.id} left room: ${room}`);
         
         socket.to(room).emit('user_left', { socketId: socket.id });
+
+        // Broadcast updated room list
+        this.io.emit('rooms_update', this.getActiveRooms());
       });
 
       socket.on('disconnect', () => {
         console.log(`Socket client disconnected: ${socket.id}`);
+        // Broadcast updated room list
+        this.io.emit('rooms_update', this.getActiveRooms());
       });
     });
 
@@ -72,3 +102,4 @@ class EventService extends EventEmitter {
 }
 
 export default new EventService();
+

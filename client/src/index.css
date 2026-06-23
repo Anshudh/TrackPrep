@@ -298,3 +298,29 @@ body {
   color: var(--accent-danger) !important;
   border: 1px solid rgba(214, 123, 115, 0.2) !important;
 }
+
+/* Study Room Pills */
+.room-pill {
+  background: rgba(32, 28, 25, 0.4);
+  border: 1px solid rgba(224, 169, 109, 0.25);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.room-pill:hover {
+  background: rgba(224, 169, 109, 0.1);
+  border-color: rgba(224, 169, 109, 0.5);
+  color: var(--text-primary);
+  transform: translateY(-1.5px);
+}
+
+.room-pill-active {
+  background: linear-gradient(135deg, var(--primary-neon) 0%, #c59258 100%);
+  border: 1px solid var(--primary-neon);
+  color: #110f0d !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(224, 169, 109, 0.15);
+}
+

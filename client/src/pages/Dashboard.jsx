@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchDashboardStats } from '../services/api';
-import { useSocket } from '../services/socket';
+import { useSocketContext } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
 import { 
   Code2, 
@@ -9,7 +9,9 @@ import {
   CalendarCheck, 
   TrendingUp, 
   Plus,
-  Compass
+  Compass,
+  Users,
+  Hash
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -30,57 +32,35 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const socket = useSocket();
-  const [activities, setActivities] = useState([]);
-  const [joinedRoom, setJoinedRoom] = useState(null);
+  const {
+    socket,
+    activities,
+    joinedRoom,
+    roomMessages,
+    activeRooms,
+    joinRoom: connectToRoom,
+    leaveRoom: disconnectFromRoom,
+    sendRoomMessage
+  } = useSocketContext();
+
   const [roomName, setRoomName] = useState('');
-  const [roomMessages, setRoomMessages] = useState([]);
   const [progressMsg, setProgressMsg] = useState('');
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleActivity = (activity) => {
-      setActivities((prev) => [activity, ...prev].slice(0, 10));
-    };
-
-    const handleRoomMessage = (msg) => {
-      setRoomMessages((prev) => [...prev, msg]);
-    };
-
-    socket.on('live_activity', handleActivity);
-    socket.on('room_message', handleRoomMessage);
-
-    return () => {
-      socket.off('live_activity', handleActivity);
-      socket.off('room_message', handleRoomMessage);
-    };
-  }, [socket]);
 
   const joinRoom = (e) => {
     e.preventDefault();
-    if (!roomName.trim() || !socket) return;
-    socket.emit('join_room', roomName);
-    setJoinedRoom(roomName);
-    setRoomMessages([]);
+    if (!roomName.trim()) return;
+    connectToRoom(roomName);
   };
 
   const leaveRoom = () => {
-    if (!socket || !joinedRoom) return;
-    socket.emit('leave_room', joinedRoom);
-    setJoinedRoom(null);
+    disconnectFromRoom();
     setRoomName('');
-    setRoomMessages([]);
   };
 
   const sendProgressUpdate = (e) => {
     e.preventDefault();
-    if (!progressMsg.trim() || !socket || !joinedRoom) return;
-    socket.emit('send_room_message', {
-      room: joinedRoom,
-      text: progressMsg,
-      sender: user?.name || 'Me'
-    });
+    if (!progressMsg.trim()) return;
+    sendRoomMessage(progressMsg);
     setProgressMsg('');
   };
 
@@ -402,6 +382,45 @@ const Dashboard = () => {
             <h5 className="text-white mb-3 fw-bold d-flex align-items-center gap-2">
               <Compass size={18} className="text-neon-secondary" /> Study Groups (Socket.io Rooms)
             </h5>
+
+            {/* Active Rooms list */}
+            <div className="mb-4">
+              <span className="text-muted small fw-medium text-uppercase d-block mb-2">Active Rooms to Join</span>
+              {!activeRooms || activeRooms.length === 0 ? (
+                <div className="text-muted small p-3 rounded-3 bg-black bg-opacity-20 border border-light border-opacity-5 text-center">
+                  No active rooms right now. Create one below to start!
+                </div>
+              ) : (
+                <div className="d-flex flex-wrap gap-2 overflow-auto pr-1" style={{ maxHeight: '100px' }}>
+                  {activeRooms.map((room) => {
+                    const isActive = joinedRoom === room.name;
+                    return (
+                      <button
+                        key={room.name}
+                        onClick={() => { if (!isActive) connectToRoom(room.name); }}
+                        className={`btn btn-sm rounded-pill d-flex align-items-center gap-2 px-3 py-1.5 ${
+                          isActive ? 'room-pill-active' : 'room-pill'
+                        }`}
+                      >
+                        <Hash size={13} className={isActive ? 'text-black' : 'text-neon-primary'} />
+                        <span>{room.name}</span>
+                        <span 
+                          className={`badge rounded-pill d-flex align-items-center gap-1 ${
+                            isActive ? 'bg-black text-neon-primary bg-opacity-80' : 'bg-white bg-opacity-10 text-muted'
+                          }`}
+                          style={{ fontSize: '0.7rem' }}
+                        >
+                          <Users size={10} />
+                          {room.count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <hr className="border-light opacity-10 my-3" />
             
             {joinedRoom ? (
               <div>

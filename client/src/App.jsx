@@ -7,6 +7,7 @@ import {
   Outlet 
 } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 
 // Components & Pages
 import Sidebar from './components/Sidebar';
@@ -75,31 +76,33 @@ const AppLayout = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Public Route */}
-          <Route path="/login" element={<Login />} />
+      <SocketProvider>
+        <Router>
+          <Routes>
+            {/* Public Route */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Protected Routes */}
-          <Route 
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/problems" element={<Problems />} />
-            <Route path="/applications" element={<Applications />} />
-            <Route path="/planner" element={<StudyPlanner />} />
-            {/* Redirect fallback */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Route>
+            {/* Protected Routes */}
+            <Route 
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/problems" element={<Problems />} />
+              <Route path="/applications" element={<Applications />} />
+              <Route path="/planner" element={<StudyPlanner />} />
+              {/* Redirect fallback */}
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Route>
 
-          {/* Root Fallback Redirect */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </Router>
+            {/* Root Fallback Redirect */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Router>
+      </SocketProvider>
     </AuthProvider>
   );
 }
